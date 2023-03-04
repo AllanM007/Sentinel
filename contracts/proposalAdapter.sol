@@ -28,7 +28,7 @@ contract Proposal {
         string firstTokenName;
         string secondTokenName;
         string dataSource;
-        string apiKey;
+        // string apiKey;
         uint256 proposalTimestamp;
         uint256 tokenPairExchangeRate;
         uint256 forVotes;
@@ -77,7 +77,13 @@ contract Proposal {
     function voteProposal(uint256 _proposalId, uint256 vote) public payable returns (bool){
         require(10000000000000000  > msg.value, "Insufficient proposal stake amount!!");
         IERC20(governanceTokenAddress).transferFrom(msg.sender, address(this), 10000000000000000);
-        
+
+        if (vote == true) {
+            proposal[_proposalId].forVotes ++;
+        } else {
+            proposal[_proposalId].againstVotes ++;
+        }
+
         return true;
     }
 
@@ -92,8 +98,9 @@ contract Proposal {
 
         if (block.timestamp > currentTime) {
             proposalMetaData[_proposalId].status = false;
-        } else {
-            
+        } 
+        else {
+            proposalMetaData[_proposalId].status = true;
         }
         currentProposal = proposalMetaData[id] = _proposalId;
         currentProposal.status = false;

@@ -11,8 +11,6 @@ import "hardhat/console.sol";
 /// @dev Explain to a developer any extra details
 
 abstract contract Dispute{
-
-    // string public contract;
     
     mapping (uint256 => uint) public disputeTime;
     mapping (uint => uint) public disputeVote;
@@ -26,11 +24,16 @@ abstract contract Dispute{
         bool status;
     }
 
+    disputeMetaData dispute;
+
     /// @notice Event triggered when a dispute is raised on a bad feed
     event disputeRaised(address disputeRaiser, address disputeSource, uint256 disputeSourceId);
+
+    /// @notice Event triggered when a dispute is paused on a bad feed
+    event disputePaused(address disputeRaiser, address disputeSource, uint256 disputeSourceId);
     
     /// @notice Event triggered when a dispute is resolved on a disputed bad feed
-    event disputeResolved(address disputeRaiser, address disputeSource, uint256 disputeSourceId);
+    event disputeResolved(address disputeRaiser, address disputeSource, uint256 disputeSourceId, bool disputOutcome);
 
     constructor(){
         disputeTime = block.timestamp;
