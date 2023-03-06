@@ -66,6 +66,10 @@ contract Aggregator {
         return true;
     }
 
+    function calculateAggregations(uint[] _oracleResponses) returns (bool) {
+        
+    }
+
     function getAggregation(uint256 _aggregationId) public pure returns ( aggregateMetaData memory ){
         return aggregateId[_aggregationId];
     }
