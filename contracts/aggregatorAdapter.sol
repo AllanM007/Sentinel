@@ -13,8 +13,9 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract Aggregator {
 
-    address governanceTokenAddress;
+    address public governanceTokenAddress;
     address[] public members;
+    uint256[] private oracleResponses;
     mapping( uint256 => proposal) public proposalId;
     mapping (uint256 => uint) public proposalTime;
     mapping (uint => uint) public proposalVote;
@@ -30,7 +31,7 @@ contract Aggregator {
         bool status;
     }
 
-    aggregateMetaData aggregate;
+    aggregateMetaData internal aggregate;
 
     /// @notice Event triggered when a aggregation is started for a feed
     event aggregateStarted(address proposer, uint256 aggregateId);
@@ -53,7 +54,7 @@ contract Aggregator {
     /// @dev metadata such as url,api key
     /// @param Documents a parameter just like in doxygen (must be followed by parameter name)
     /// @return Documents the return variables of a contract’s function state variable
-    function newAggregation(uint256 _firstToken, uint256 _secondToken, uint256 _pairExchange, string _proposerName, uint256 trustLevel) public returns (bool){
+    function    newAggregation(uint256 _firstToken, uint256 _secondToken, uint256 _pairExchange, string _proposerName, uint256 trustLevel) public returns (bool){
         noOfProposals ++;
 
         proposal.id = noOfProposals;
