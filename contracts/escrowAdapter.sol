@@ -15,15 +15,15 @@ contract Escrow {
     struct requestData {
         uint id;
         uint256 reqAmount;
-        address requestOrigin;
+        // address requestOrigin;
         address oracleOrigin;
         uint256 disputeDeadline;
         bool status;
     }
 
-    mapping(uint256 => requestData) reqData;
+    requestData[] public requestDeposits;
 
-    // requestData reqData;
+    mapping(uint256 => requestData) reqData;
 
     constructor(address _txToken) {
         transactionToken = _txToken;
@@ -31,10 +31,27 @@ contract Escrow {
 
     /// @notice This is a payable function that recieves the requester/oracle stake and verifies stake amount/oracle and requester addresses
     /// @return Returns a boolean value if the transaction is completed succesfully
-    function requestDeposit(address _requestOrigin, uint _amount, uint256 _timeStamp) public payable returns( bool ){
+    function requestDeposit(address _oracleAddress, uint _amount, uint256 _timeStamp) public payable returns( bool ){
+        
+        //minimum data provider staking amount requirement check
         require(10000000000000000  > _amount, "INSUFFICIENT_REQUEST_STAKE_AMOUNT!!");
+       
+        // transfer stake from data provider to escrow contract
         IERC20(transactionToken).transferFrom(msg.sender, address(this), _amount);
 
+        //get escrow reqests array last item index
+        uint256 escrowRequestsLength = requestDeposits.length - 1;
+
+        //get last escrow request item
+        requestData memory lastEscrowRequest = requestDeposits[escrowRequestsLength];
+
+        //set expiry time for dispute 3 days after amount is staked in escrow
+        uint256 disputeExpiryDeadline = _timeStamp + 3 days;
+
+        //add new data provider escrow request to requests array
+        requestDeposits.push(requestData(lastEscrowRequest.id++, _amount, _oracleAddress, disputeExpiryDeadline, true));
+
+        //succesful escrow stake by data provider
         return true;
     }
 
