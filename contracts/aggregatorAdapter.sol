@@ -54,7 +54,7 @@ contract Aggregator {
     /// @dev metadata such as url,api key
     /// @param Documents a parameter just like in doxygen (must be followed by parameter name)
     /// @return Documents the return variables of a contract’s function state variable
-    function    newAggregation(uint256 _firstToken, uint256 _secondToken, uint256 _pairExchange, string _proposerName, uint256 trustLevel) public returns (bool){
+    function newAggregation(uint256 _firstToken, uint256 _secondToken, uint256 _pairExchange, string _proposerName, uint256 trustLevel) public returns (bool){
         noOfProposals ++;
 
         proposal.id = noOfProposals;
