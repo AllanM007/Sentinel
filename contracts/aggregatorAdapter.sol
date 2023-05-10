@@ -19,7 +19,7 @@ contract Aggregator {
     address public governanceTokenAddress;
     address[] public members;
     uint256[] private oracleResponses;
-    mapping(uint256 => proposal) public proposalId;
+    mapping(uint256 => proposal) public proposalId; //to be reviewed
     mapping (uint256 => uint) public proposalTime;
     mapping (uint => uint) public proposalVote;
 
