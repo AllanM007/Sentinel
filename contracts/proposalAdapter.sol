@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 pragma experimental ABIEncoderV2;
 
 
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /// @title A title that should describe the contract/interface
@@ -17,7 +17,7 @@ contract Proposal {
     address[] public members;
     uint256 public genesisTimeStamp;
     uint256 noOfProposals;
-    mapping( uint256 => proposal) public proposalId;
+    mapping( uint256 => proposalMetaData) public proposalId;
     mapping (uint256 => uint) public proposalTime;
     mapping (uint => uint) public proposalVote;
 
@@ -25,8 +25,8 @@ contract Proposal {
         uint256 id;
         string proposerName;
         address proposerAddress;
-        string firstTokenName;
-        string secondTokenName;
+        address firstToken;
+        address secondToken;
         string dataSource;
         // string apiKey;
         uint256 proposalTimestamp;
@@ -43,21 +43,26 @@ contract Proposal {
     event proposalRaised(address proposer, uint256 proposalId);
     
     /// @notice Event triggered when a vote is casted for an active proposal of a new feed
-    event proposalVote(address proposalVoter, uint256 proposalId);
+    // event proposalVote(address proposalVoter, uint256 proposalId);
     
     /// @notice Event triggered when a proposal for a new ends/cancelled/participation time expires
     event proposalDeactivated(uint256 proposalId);
 
     constructor(address _govTokenAddress){
-        governanceTokenAddress = _govToken;
+        governanceTokenAddress = _govTokenAddress;
         genesisTimeStamp = block.timestamp;
     }
 
     /// @notice new proposals to add a token pair feed to the oracle
     /// @dev metadata such as url,api key
-    /// @param Documents a parameter just like in doxygen (must be followed by parameter name)
-    /// @return Documents the return variables of a contract’s function state variable
-    function newProposal(uint256 _firstToken, uint256 _secondToken, uint256 _pairExchange, string _proposerName, uint256 trustLevel) public returns (bool){
+    /// @return the return variables of a contract’s function state variable
+    function newProposal(
+        address _firstToken,
+        address _secondToken,
+        uint256 _pairExchange,
+        string memory _proposerName,
+        uint256 trustLevel
+    ) public returns (bool){
         noOfProposals ++;
 
         proposal.id = noOfProposals;
@@ -65,12 +70,12 @@ contract Proposal {
         proposal.proposerAddress = msg.sender;
         proposal.proposalTimestamp = block.timestamp;
         proposal.status = true;
-        proposal.firstToken = firstToken;
+        proposal.firstToken = _firstToken;
 
         return true;
     }
 
-    function getProposal(uint256 _proposalId) public pure returns ( proposalMetaData memory ){
+    function getProposal(uint256 _proposalId) public view returns ( proposalMetaData memory ){
         return proposalId[_proposalId];
     }
 
@@ -78,32 +83,32 @@ contract Proposal {
         require(10000000000000000  > msg.value, "Insufficient proposal stake amount!!");
         IERC20(governanceTokenAddress).transferFrom(msg.sender, address(this), 10000000000000000);
 
-        if (vote == true) {
-            proposal[_proposalId].forVotes ++;
-        } else {
-            proposal[_proposalId].againstVotes ++;
-        }
+        // if (vote == true) {
+        //     proposal[_proposalId].forVotes ++;
+        // } else {
+        //     proposal[_proposalId].againstVotes ++;
+        // }
 
         return true;
     }
 
     function cancelProposal(uint256 _proposalId) public returns (bool){
-        currentProposal = proposalMetaData[id] = _proposalId;
-        currentProposal.status = false;
+        // currentProposal = proposalMetaData[id] = _proposalId;
+        // currentProposal.status = false;
         return true;
     }
 
-    function deactivateProposal(uint256 _proposalId) public returns (bool){
-        uint256 currentTime = proposalMetaData[_proposalId].expiryDate;
+    // function deactivateProposal(uint256 _proposalId) public returns (bool){
+    //     uint256 currentTime = proposalMetaData[_proposalId].expiryDate;
 
-        if (block.timestamp > currentTime) {
-            proposalMetaData[_proposalId].status = false;
-        } 
-        else {
-            proposalMetaData[_proposalId].status = true;
-        }
-        currentProposal = proposalMetaData[id] = _proposalId;
-        currentProposal.status = false;
-        return true;
-    }
+    //     if (block.timestamp > currentTime) {
+    //         proposalMetaData[_proposalId].status = false;
+    //     } 
+    //     else {
+    //         proposalMetaData[_proposalId].status = true;
+    //     }
+    //     // currentProposal = proposalMetaData[id] = _proposalId;
+    //     // currentProposal.status = false;
+    //     return true;
+    // }
 }

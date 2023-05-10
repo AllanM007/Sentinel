@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /// @title A title that should describe the contract/interface
@@ -11,7 +11,7 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 abstract contract Oracle{
 
-    string public Oracle;
+    string public oracle;
 
     struct tokenPairs{
         uint256 id;
@@ -21,14 +21,22 @@ abstract contract Oracle{
     }
 
     constructor(string storage _oracleName){
-        Oracle = _oracleName;
+        oracle = _oracleName;
     }
 
-    function newPair(uint256 firstToken, uint256 secondToken, uint256 pairExchange, uint256 trustLevel) public pure returns (bool){
+    function newPair(
+        uint256 firstToken,
+        uint256 secondToken,
+        uint256 pairExchange,
+        uint256 trustLevel
+    ) public pure returns (bool){
         return true;
     }
 
-    function getPairExchangeRate(uint256 firstToken, uint256 secondToken) public payable returns (bool){
+    function getPairExchangeRate(
+        uint256 firstToken,
+        uint256 secondToken
+    ) public payable returns (bool){
         return true;
     }
 }

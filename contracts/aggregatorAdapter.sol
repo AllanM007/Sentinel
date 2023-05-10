@@ -3,8 +3,9 @@ pragma solidity ^0.8.0;
 pragma experimental ABIEncoderV2;
 
 
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import './proposalAdapter.sol';
 
 /// @title A title that should describe the contract/interface
 /// @author The name of the author
@@ -13,10 +14,12 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract Aggregator {
 
+    Proposal proposal;
+
     address public governanceTokenAddress;
     address[] public members;
     uint256[] private oracleResponses;
-    mapping( uint256 => proposal) public proposalId;
+    mapping(uint256 => proposal) public proposalId;
     mapping (uint256 => uint) public proposalTime;
     mapping (uint => uint) public proposalVote;
 
@@ -33,6 +36,9 @@ contract Aggregator {
 
     aggregateMetaData internal aggregate;
 
+    uint256 genesisTimeStamp;
+    uint256 noOfProposals;
+
     /// @notice Event triggered when a aggregation is started for a feed
     event aggregateStarted(address proposer, uint256 aggregateId);
     
@@ -46,15 +52,19 @@ contract Aggregator {
     event aggregateFailed(uint256 aggregateId);
 
     constructor(address _govTokenAddress){
-        governanceTokenAddress = _govToken;
+        governanceTokenAddress = _govTokenAddress;
         genesisTimeStamp = block.timestamp;
     }
 
     /// @notice new proposals to add a token pair feed to the oracle
     /// @dev metadata such as url,api key
-    /// @param Documents a parameter just like in doxygen (must be followed by parameter name)
-    /// @return Documents the return variables of a contract’s function state variable
-    function newAggregation(uint256 _firstToken, uint256 _secondToken, uint256 _pairExchange, string _proposerName, uint256 trustLevel) public returns (bool){
+    function newAggregation(
+        uint256 _firstToken,
+        uint256 _secondToken,
+        uint256 _pairExchange,
+        string _proposerName,
+        uint256 trustLevel
+    ) public returns (bool){
         noOfProposals ++;
 
         proposal.id = noOfProposals;
@@ -62,17 +72,17 @@ contract Aggregator {
         proposal.proposerAddress = msg.sender;
         proposal.proposalTimestamp = block.timestamp;
         proposal.status = true;
-        proposal.firstToken = firstToken;
+        proposal.firstToken = _firstToken;
 
         return true;
     }
 
-    function calculateAggregations(uint[] _oracleResponses) returns (bool) {
+    function calculateAggregations(uint[] _oracleResponses) private returns (bool) {
         
     }
 
     function getAggregation(uint256 _aggregationId) public pure returns ( aggregateMetaData memory ){
-        return aggregateId[_aggregationId];
+        return aggregate[_aggregationId];
     }
 
     // function voteProposal(uint256 _proposalId, uint256 vote) public payable returns (bool){
@@ -89,8 +99,8 @@ contract Aggregator {
     // }
 
     function cancelAggregation(uint256 _aggregationId) public returns (bool){
-        currentAggregation = aggregationMetaData[id] = _aggregationId;
-        currentAggregation.status = false;
+        // currentAggregation = aggregationMetaData[id] = _aggregationId;
+        // currentAggregation.status = false;
         return true;
     }
 
@@ -103,8 +113,8 @@ contract Aggregator {
         else {
             aggregateMetaData[_aggregationId].status = true;
         }
-        currentAggregation = aggregateMetaData[id] = _aggregationId;
-        currentAggregation.status = false;
+        // currentAggregation = aggregateMetaData[id] = _aggregationId;
+        // currentAggregation.status = false;
         return true;
     }
 }
