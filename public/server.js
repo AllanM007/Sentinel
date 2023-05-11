@@ -6,7 +6,6 @@ const url = require("url");
 const path = require("path");
 const axios = require("axios");
 const bodyParser = require("body-parser");
-const mailchimp = require("@mailchimp/mailchimp_marketing");
 
 const router = express.Router();
 

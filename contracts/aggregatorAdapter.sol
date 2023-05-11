@@ -7,37 +7,53 @@ pragma experimental ABIEncoderV2;
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import './proposalAdapter.sol';
 
-/// @title A title that should describe the contract/interface
-/// @author The name of the author
-/// @notice Explain to an end user what this does
-/// @dev Explain to a developer any extra details
+/// @title Price Aggregator Contract
+/// @author 0xAllan
+/// @notice This contract handles the aggregation of different prices from data providers to set the optimal ratio
 
 contract Aggregator {
 
-    Proposal proposal;
+    string constant public name = "Sentinel Aggregator";
 
-    address public governanceTokenAddress;
-    address[] public members;
-    uint256[] private oracleResponses;
-    mapping(uint256 => proposal) public proposalId; //to be reviewed
-    mapping (uint256 => uint) public proposalTime;
-    mapping (uint => uint) public proposalVote;
+    // address public governanceTokenAddress;
 
     struct aggregateMetaData {
         uint id;
-        address aggregateSourceAddress;
         string firstTokenName;
         string secondTokenName;
-        string dataSource;
+        address[] dataProviders;
         uint256 aggregateDeadlineTimestamp;
         uint256 tokenPairExchangeRate;
         bool status;
     }
 
+    struct tokenExchangeRatio {
+        uint256 tokenA;
+        uint256 tokenB;
+        uint256 expiry;
+    }
+
+    uint256[] private providerIds;
+
+    uint256[] private tokenAArray;
+    uint256[] private tokenBArray;
+
+    mapping(uint256 => uint256[]) private pairTokenA;
+    mapping(uint256 => uint256[]) private pairTokenB;
+
+    // mapping (uint256 => uint) public aggregationTime;
+    // mapping (uint => uint) public aggregationAnswer;
+
+    uint256 public noOfAggregations;
+
+    uint256 public noOfPairs;
+
+    mapping(uint256 => tokenExchangeRatio) public pairRatio;
+
+    mapping(uint256 => tokenExchangeRatio) public providerRatio;
+
     aggregateMetaData internal aggregate;
 
-    uint256 genesisTimeStamp;
-    uint256 noOfProposals;
 
     /// @notice Event triggered when a aggregation is started for a feed
     event aggregateStarted(address proposer, uint256 aggregateId);
@@ -51,70 +67,52 @@ contract Aggregator {
     /// @notice Event triggered when an aggregation for a feed fails
     event aggregateFailed(uint256 aggregateId);
 
-    constructor(address _govTokenAddress){
-        governanceTokenAddress = _govTokenAddress;
-        genesisTimeStamp = block.timestamp;
+    constructor(){}
+
+    // function getPairs() view public returns () {}
+
+    function recievePrice(
+        uint256 _providerId,
+        uint256 _pairId,
+        uint256 _tokenA,
+        uint256 _tokenB,
+        uint256 _timeStamp
+    ) public returns (bool) {
+
+        require(_timeStamp > block.timestamp, "INVALID_TIME_FEED");
+
+        uint256 priceExpiry = _timeStamp + 15 minutes;
+
+        providerRatio[_providerId] = tokenExchangeRatio(_tokenA, _tokenB, priceExpiry);
+
+        pairRatio[_pairId] = tokenExchangeRatio(_tokenA, _tokenB, priceExpiry);
+
+        tokenAArray.push(_tokenA);
+        tokenBArray.push(_tokenB);
+
+        return true;  
     }
 
     /// @notice new proposals to add a token pair feed to the oracle
     /// @dev metadata such as url,api key
-    function newAggregation(
-        uint256 _firstToken,
-        uint256 _secondToken,
-        uint256 _pairExchange,
-        string _proposerName,
-        uint256 trustLevel
+    function newAggregationPrice(
+        uint256 pairId,
+        uint256 _firstTokenId,
+        uint256 _secondTokenId,
+        uint256[] memory _pairRatio,
+        uint256 _proposerId,
+        uint256 timeStamp
     ) public returns (bool){
-        noOfProposals ++;
-
-        proposal.id = noOfProposals;
-        proposal.proposerName = _proposerName;
-        proposal.proposerAddress = msg.sender;
-        proposal.proposalTimestamp = block.timestamp;
-        proposal.status = true;
-        proposal.firstToken = _firstToken;
+        noOfAggregations ++;
 
         return true;
     }
 
-    function calculateAggregations(uint[] _oracleResponses) private returns (bool) {
-        
+    function calculateAggregate(
+        uint256[] memory array
+    ) public pure returns (uint256) {
+        uint256 answer = 9;
+        return answer;
     }
 
-    function getAggregation(uint256 _aggregationId) public pure returns ( aggregateMetaData memory ){
-        return aggregate[_aggregationId];
-    }
-
-    // function voteProposal(uint256 _proposalId, uint256 vote) public payable returns (bool){
-    //     require(10000000000000000  > msg.value, "Insufficient proposal stake amount!!");
-    //     IERC20(governanceTokenAddress).transferFrom(msg.sender, address(this), 10000000000000000);
-
-    //     if (vote == true) {
-    //         proposal[_proposalId].forVotes ++;
-    //     } else {
-    //         proposal[_proposalId].againstVotes ++;
-    //     }
-
-    //     return true;
-    // }
-
-    function cancelAggregation(uint256 _aggregationId) public returns (bool){
-        // currentAggregation = aggregationMetaData[id] = _aggregationId;
-        // currentAggregation.status = false;
-        return true;
-    }
-
-    function deactivateAggregation(uint256 _aggregationId) public returns (bool){
-        uint256 currentTime = aggregateMetaData[_aggregationId].expiryDate;
-
-        if (block.timestamp > currentTime) {
-            aggregateMetaData[_aggregationId].status = false;
-        } 
-        else {
-            aggregateMetaData[_aggregationId].status = true;
-        }
-        // currentAggregation = aggregateMetaData[id] = _aggregationId;
-        // currentAggregation.status = false;
-        return true;
-    }
 }
