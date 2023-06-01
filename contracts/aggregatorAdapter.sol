@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 
 
 // import "hardhat/console.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import './proposalAdapter.sol';
 
 /// @title Price Aggregator Contract
@@ -13,46 +13,55 @@ import './proposalAdapter.sol';
 
 contract Aggregator {
 
-    string constant public name = "Sentinel Aggregator";
+    string constant public name = "Sentinel Aggregator v1";
 
     // address public governanceToken0ddress;
-
-    struct aggregateMetaData {
-        uint id;
-        string firstTokenName;
-        string secondTokenName;
-        address[] dataProviders;
-        uint aggregateDeadlineTimestamp;
-        uint tokenPairExchangeRate;
-        bool status;
-    }
-
+    // struct for storing a token pair exchange rate ratio and the expiry date
     struct tokenExchangeRatio {
         uint token0;
         uint token1;
         uint expiry;
     }
 
+    // struct to store an aggregation instance metadata
+    struct aggregateMetaData {
+        uint id;
+        string firstTokenName;
+        string secondTokenName;
+        address[] dataProviders;
+        uint aggregateDeadlineTimestamp;
+        // tokenExchangeRatio tokenPairExchangeRate;
+        // token0Array firstTokenArray;
+        // token1Array secondTokenArray;
+        bool status;
+    }
+
+    // stores verified provider Ids
     uint[] private providerIds;
 
+    // array containing 1st token provider entries for aggregation
     uint[] private token0Array;
+    // array containing 2nd token provider entries for aggregation
     uint[] private token1Array;
 
+    //
     mapping(uint => uint[]) private pairToken0;
+    //
     mapping(uint => uint[]) private pairToken1;
 
-    // mapping (uint => uint) public aggregationTime;
-    // mapping (uint => uint) public aggregationAnswer;
+    uint private noOfPairs;
 
-    // uint public noOfAggregations;
-
-    uint public noOfPairs;
-
+    //mapping of registered pair to their respective token exchange ratio
     mapping(uint => tokenExchangeRatio) public pairRatio;
 
-    mapping(uint => tokenExchangeRatio) public providerRatio;
+    //mapping of registered provider to their respective token exchange ratio incase of dispute
+    mapping(uint => tokenExchangeRatio) private providerRatio;
 
+    // internal reference instance to the aggregateMetadata struct
     aggregateMetaData internal aggregate;
+
+    // array to store provider ids for deviated feeds
+    mapping(uint => uint[]) deviatedProviderIds;
 
     /// @notice Event triggered when a aggregation is started for a feed
     event aggregateStarted(address proposer, uint aggregateId);
@@ -70,6 +79,7 @@ contract Aggregator {
 
     // function getPairs() view public returns () {}
 
+     /// @notice receive data feed to contract for aggregation
     function recievePrice(
         uint _providerId,
         uint _pairId,
@@ -127,7 +137,7 @@ contract Aggregator {
     }
 
     function calculateAggregate(
-        uint[] memory array
+        uint[] memory tokenArray
     ) public pure returns (uint) {
         uint answer = 9;
         return answer;
@@ -135,20 +145,27 @@ contract Aggregator {
 
     function checkDeviation(
         uint[] memory _tokenArray,
-        uint _providerId
-    ) private pure returns(uint){
+        uint _providerId,
+        uint _pairId
+    ) private returns(uint){
 
-        if (_tokenArray.length > 3) {
+        uint deviationThreshHold = 3;
+
+        if (_tokenArray.length > 2) {
             for (uint index = 0; index < _tokenArray.length; index++) {
-                
+                if ((_tokenArray[index] - _tokenArray[index-1]) > deviationThreshHold) {
+                    deviatedProviderIds[_pairId].push(_providerId);
+                } else {
+                    // console.log("Token has not deviated the minimum threshold");
+                }
             }
         } else {
-            
+            // console.log("Array not long enough");
         }
     }
 
 function getMedian(uint[] memory data) public pure returns (uint) {
-    require(data.length > 0, "Array must not be empty");
+    require(data.length > 0, "ARRAY MUST NOT BE EMPTY");
     uint[] memory sortedData = sort(data);
     uint middleIndex = sortedData.length / 2;
     if (sortedData.length % 2 == 0) {
@@ -177,6 +194,5 @@ function sort(uint[] memory data) internal pure returns (uint[] memory) {
         return data;
     }
 }
-
 
 }

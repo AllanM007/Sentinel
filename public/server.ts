@@ -23,22 +23,6 @@ router.post("/newContact", function (req, res) {
   // console.log(req);
   const FormData = req.body;
   console.log(req.body);
-
-  request
-    .then((result) => {
-      console.log(result.body);
-      res.send({
-        status: 200,
-        message: "Request Succesful",
-      });
-    })
-    .catch((err) => {
-      console.log(err.response.status);
-      res.send({
-        status: err.response.status,
-        message: err.response.statusText,
-      });
-    });
 });
 
 //add the router

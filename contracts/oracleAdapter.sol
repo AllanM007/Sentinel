@@ -2,27 +2,24 @@
 pragma solidity ^0.8.0;
 
 // import "hardhat/console.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./aggregatorAdapter.sol";
 
 /// @title A title that should describe the contract/interface
 /// @author The name of the author
 /// @notice Explain to an end user what this does
 /// @dev Explain to a developer any extra details
 
-abstract contract Oracle{
+contract Oracle {
 
-    string public oracle;
-
-    struct tokenPairs{
+    struct tokenPairs {
         uint256 id;
         string firstTokenName;
         string secondTokenName;
         uint256 tokenPairExchangeRate;
     }
 
-    constructor(string storage _oracleName){
-        oracle = _oracleName;
-    }
+    constructor(){}
 
     function newPair(
         uint256 firstToken,
