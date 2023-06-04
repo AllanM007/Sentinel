@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 
 /// @title ERC20 Token
@@ -11,25 +11,26 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 contract SNT is ERC20 {
 
     string constant token = "SNT";
+    address private owner;
 
     constructor(uint _tokenAmount) ERC20("Sentinel", "SNT") {
         _mint(msg.sender, 1000);
-        // owner() = msg.sender;
+        owner = msg.sender;
     }
 
     modifier onlyOwner() {
-        require(msg.sender = owner(), "OWNER_ONLY_FUNCTION");
+        require(msg.sender = owner, "OWNER_ONLY_FUNCTION");
         _;
     }
 
-    function mintSNT(uint _amount, address _recipient) onlyOwner() returns (bool) {
+    function mintSNT(uint _amount, address _recipient) onlyOwner() public returns (bool) {
         
         _mint(_recipient, _amount);
 
         return true;
     }
 
-    function burnSNT(uint _amount, address _recipient) onlyOwner() returns (bool) {
+    function burnSNT(uint _amount, address _recipient) onlyOwner() public returns (bool) {
         
         _burn(_recipient, _amount);
 

@@ -13,26 +13,27 @@ import "./aggregatorAdapter.sol";
 contract Oracle {
 
     struct tokenPairs {
-        uint256 id;
+        uint id;
         string firstTokenName;
         string secondTokenName;
-        uint256 tokenPairExchangeRate;
+        uint tokenPairExchangeRate;
     }
 
     constructor(){}
 
     function newPair(
-        uint256 firstToken,
-        uint256 secondToken,
-        uint256 pairExchange,
-        uint256 trustLevel
+        uint firstToken,
+        uint secondToken,
+        uint pairExchange,
+        uint trustLevel
     ) public pure returns (bool){
         return true;
     }
 
     function getPairExchangeRate(
-        uint256 firstToken,
-        uint256 secondToken
+        uint _oracleId,
+        uint firstToken,
+        uint secondToken
     ) public payable returns (bool){
         return true;
     }
